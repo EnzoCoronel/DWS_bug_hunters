@@ -1,0 +1,7 @@
+{
+  "name": "dws-bug-hunters",
+  "version": "1.0.0",
+  "main": "resources/index.js",
+  "license": "MIT",
+  "type": "module"
+}
