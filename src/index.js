@@ -3,9 +3,10 @@ import axios from "axios";
 
 //your code goes here;
 const menu = async () => {
+  const api = "https://ir39vnlo.directus.app/items/";
   const getFac = async (fac) => {
     const response = (
-      await axios.get("https://ir39vnlo.directus.app/items/factions")
+      await axios.get(api + fac)
     ).data;
     return response;
   }
@@ -17,7 +18,7 @@ const menu = async () => {
     switch (choice) {
       case "1":
         try {
-          const factions = await getFac("fac");
+          const factions = await getFac("factions");
           console.log(factions);
         } catch (error) {
           console.log(error);
