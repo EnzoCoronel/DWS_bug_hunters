@@ -4,8 +4,16 @@ import axios from "axios";
 //your code goes here;
 const menu = async () => {
   const api = "https://ir39vnlo.directus.app/items/";
-  const getApi = async (fac) => {
-    const response = (await axios.get(api + fac)).data.data;
+  const getApi = async (item) => {
+    const response = (await axios.get(api + item)).data.data;
+    return response;
+  };
+
+  const postApi = async (char, item) => {
+    const response = (await axios.post(api + item).data, {
+      name: username,
+      factions: userFaction
+    })
     return response;
   };
 
@@ -30,25 +38,33 @@ const menu = async () => {
       case "1":
         console.log("Tell me traveller, who's side are you on?");
         const factions = await printFactions();
-        const userFaction = await read("");
-        switch (userFaction) {
+        const numFaction = await read("");
+        let userFaction = '';
+        switch (numFaction) {
           case "1":
-            console.log(`Welcome Frontend dev!`);
+            userFaction = 'Frontend';
             break;
             case "2":
-              console.log(`Welcome Backend dev!`);
+              userFaction = 'Backend';
               break;
             case "13":
-              console.log(`Welcome Mobile dev!`);
+              userFaction = 'Mobile';
             break;
           default:
             console.error("Chose a valid option");
             break;
         }
+        console.log(`Welcome ${userFaction} dev!`);
 
         const name = await read("What is your name?\n"); //example for read user input
         console.log(`Nice to meet you ${name}!`);
 
+        try{
+          const print = await postApi("characters?fields=*,equipments.equipments_id.*,factions.factions_id.*")
+          console.log(print);
+        } catch (error){
+          console.log(error);
+        }
         break;
       case "2":
         console.log("No data");
