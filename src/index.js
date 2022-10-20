@@ -9,11 +9,14 @@ const menu = async () => {
     return response;
   };
 
-  const filterFactions = async () => {
+  const printFactions = async () => {
     try {
       const rawFac = await getApi("factions");
-      const factionsArray = rawFac.map((a) => a.name);
-      return factionsArray;
+      rawFac.forEach(element => {
+        console.log(`${element.id} - ${element.name}`)
+      });
+      console.log(rawFac);
+      return rawFac;
     } catch (error) {
       console.log(error);
     }
@@ -22,14 +25,12 @@ const menu = async () => {
   let choice = 2;
 
   while (choice != "0") {
-    choice = await read("1 - Create Character\n 2- Log in\n 0 - Exit");
+    choice = await read("1 - Create Character\n 2 - Log in\n 0 - Exit");
     switch (choice) {
       case "1":
-        const factions = await filterFactions();
         console.log("Tell me traveller, who's side are you on?");
-        const printFactions = factions.join("\n");
-
-        const userFaction = await read(printFactions + "\n");
+        const factions = await printFactions();
+        const userFaction = await read("");
         switch (userFaction) {
           case "1":
             console.log(`Welcome Frontend dev!`);
@@ -37,7 +38,7 @@ const menu = async () => {
             case "2":
               console.log(`Welcome Backend dev!`);
               break;
-            case "3":
+            case "13":
               console.log(`Welcome Mobile dev!`);
             break;
           default:
