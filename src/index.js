@@ -101,9 +101,42 @@ const menu = async () => {
     }
   };
 
+  const menu = async () => {
+    let name, nav;
+    name = await read("Do i remember you? Tell me your name.\n");
+    const user = await search(name);
+    while (nav != "0") {
+      nav = await read("1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n");
+      switch (nav) {
+        case "1":
+          console.log(
+            `Attack: ${user.atk}\nDefense: ${user.def}\nAgility: ${user.agi}\n`
+          );
+          break;
+        case "2":
+          await store(user);
+          break;
+        case "3":
+          await quests();
+          break;
+        default:
+          console.error("Chose a valid option.\n");
+          break;
+      }
+    }
+  };
+
+  const quests = async () => {
+    console.log("Quests");
+  }
+
+  const store = async (costumer) => {
+    console.log(`Gold: ${costumer.gold}`);
+  }
+
   console.log("DWS BUG HUNTERS\n");
 
-  let choice, menu, name, facId, faction;
+  let choice;
 
   while (choice != "0") {
     choice = await read("1 - Create Character\n2 - Log in\n0 - Exit\n");
@@ -112,25 +145,7 @@ const menu = async () => {
         await create();
         break;
       case "2":
-        name = await read("Do i remember you? Tell me your name.\n");
-        const user = await search(name);
-        while (menu != "0") {
-          menu = await read("1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n");
-          switch (menu) {
-            case "1":
-              console.log(user);
-              break;
-            case "2":
-            console.log("Store");
-              break;
-            case "3":
-            console.log("Quests");
-              break;
-            default:
-              console.error("Chose a valid option.\n");
-              break;
-          }
-        }
+        await menu();
         break;
       case "0":
         console.log("We will miss you!\n");
