@@ -148,7 +148,7 @@ const menu = async () => {
       let pick = equipList[buy - 1];
       if (pick.value <= costumer.gold) {
         costumer.equipments.push(pick);
-        costumer.gold = -pick.value;
+        costumer.gold -= pick.value;
         clear();
         console.log(
           `Thanks for your Purchase! Do you want anything else?\nGold: ${costumer.gold}\n`
@@ -169,15 +169,14 @@ const menu = async () => {
       attribute,
       amount;
     you.equipments.forEach((item) => {
-      console.log(item);
       amount = item.equipments_id.affected_amount;
       attribute = item.equipments_id.affected_attribute;
       if (attribute == "atk") {
-        fatk = +amount;
+        fatk += amount;
       } else if (attribute == "def") {
-        fdef = +amount;
+        fdef += amount;
       } else {
-        fagi = +amount;
+        fagi += amount;
       }
     });
     console.log(`Attack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`);
