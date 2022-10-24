@@ -1,5 +1,6 @@
 import read from "../resources/read.js";
 import axios from "axios";
+import { buffer } from "stream/consumers";
 
 //your code goes here;
 const menu = async () => {
@@ -53,15 +54,15 @@ const menu = async () => {
     let factionArray = await form();
     console.log(`Welcome ${factionArray[0]} dev!`);
 
-    name = await read("What is your name?\n"); //example for read user input
-    console.log(`Nice to meet you ${name}!\n`);
+    let newName = await read("What is your name?\n"); //example for read user input
+    console.log(`Nice to meet you ${newName}!\n`);
     let persona = {
       atk: 10,
       def: 10,
       agi: 10,
       hp: 10,
       gold: 100,
-      name: name,
+      name: newName,
       factions: [
         {
           factions_id: {
@@ -106,7 +107,7 @@ const menu = async () => {
     name = await read("Do i remember you? Tell me your name.\n");
     const user = await search(name);
     while (nav != "0") {
-      nav = await read("1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n");
+      nav = await read("\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n");
       switch (nav) {
         case "1":
           console.log(
@@ -127,12 +128,27 @@ const menu = async () => {
   };
 
   const quests = async () => {
-    console.log("Quests");
-  }
+    console.log("select a quest:\n");
+    let questList = await getApi("tasks");
+    let bugList = await getApi("bugs");
+    questList.forEach((questn, index) => {
+      let bugHp = [1];
+      questn.bugs.forEach((monstern) => {
+        let bugn = bugList.filter((bug) => bug.id == monstern);
+        bugHp.push(bugn[0].hp);
+      });
+      bugHp.shift();
+      console.log(
+        `${index + 1}: ${questn.name}\nDescription: ${
+          questn.description
+        }\nBug hp: ${bugHp}\nReward: ${questn.reward}\n`
+      );
+    });
+  };
 
   const store = async (costumer) => {
     console.log(`Gold: ${costumer.gold}`);
-  }
+  };
 
   console.log("DWS BUG HUNTERS\n");
 
