@@ -1,6 +1,6 @@
 # DWS bug hunters
 
-_DESCRICAO TOPZERA_
+You are a new member of the bug extermination squad at dws, and you need to get stronger to defeat the most powerful of bugs, for that, you must earn money to get new equipments that will help you to get stronger and advance even further in the fight against fearsome bugs.
 
 to edit start this project, you should edit the file index.js found on src/index.js
 
