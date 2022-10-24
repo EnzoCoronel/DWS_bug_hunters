@@ -126,13 +126,61 @@ const menu = async () => {
 
   const store = async (costumer) => {
     clear();
-    console.log(`Gold: ${costumer.gold}\n`);
+    console.log(
+      `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${costumer.gold}\n`
+    );
     let equipList = await getApi("equipments");
-    equipList.forEach((equipn) => {
-      console.log(
-        `${equipn.name}\nPrice: ${equipn.value} gold\nStat: +${equipn.affected_amount} ${equipn.affected_attribute}\n`
-      );
+    let buy = 1;
+    while (buy != 0) {
+      equipList.forEach((equipn, index) => {
+        console.log(
+          `${index + 1} - ${equipn.name}\nPrice: ${equipn.value} gold\nStat: +${
+            equipn.affected_amount
+          } ${equipn.affected_attribute}\n`
+        );
+      });
+      buy = await read("0 - Exit");
+      if (buy == 0) {
+        clear();
+        console.log("Take care out there my friend!");
+        return 0;
+      }
+      let pick = equipList[buy - 1];
+      if (pick.value <= costumer.gold) {
+        costumer.equipments.push(pick);
+        costumer.gold = -pick.value;
+        clear();
+        console.log(
+          `Thanks for your Purchase! Do you want anything else?\nGold: ${costumer.gold}\n`
+        );
+      } else {
+        console.log(
+          `Sorry, ${costumer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!`
+        );
+      }
+    }
+  };
+
+  const stats = async (you) => {
+    clear();
+    let fatk = you.atk,
+      fdef = you.def,
+      fagi = you.agi,
+      attribute,
+      amount;
+    you.equipments.forEach((item) => {
+      console.log(item);
+      amount = item.equipments_id.affected_amount;
+      attribute = item.equipments_id.affected_attribute;
+      if (attribute == "atk") {
+        fatk = +amount;
+      } else if (attribute == "def") {
+        fdef = +amount;
+      } else {
+        fagi = +amount;
+      }
     });
+    console.log(`Attack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`);
   };
 
   const menu = async () => {
@@ -143,19 +191,22 @@ const menu = async () => {
     const user = await search(name);
     if (!user) return 0;
     while (nav != "0") {
-      nav = await read("\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n");
+      nav = await read(
+        `\nWhat do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n`
+      );
       switch (nav) {
         case "1":
-          clear();
-          console.log(
-            `Attack: ${user.atk}\nDefense: ${user.def}\nAgility: ${user.agi}\n`
-          );
+          await stats(user);
           break;
         case "2":
           await store(user);
           break;
         case "3":
           await quests();
+          break;
+        case "0":
+          clear();
+          console.log(`Goodbye ${name}. Until next time!`);
           break;
         default:
           clear();
@@ -166,6 +217,7 @@ const menu = async () => {
   };
 
   let choice;
+  clear();
 
   while (choice != "0") {
     console.log("\n---------------\nDWS BUG HUNTERS\n---------------\n");
