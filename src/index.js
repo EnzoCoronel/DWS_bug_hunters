@@ -104,60 +104,102 @@ const menu = async () => {
     }
   };
 
+  const battle = async () => {
+    console.log("Insert battle here");
+  }
+
   const quests = async () => {
     clear();
-    console.log("select a quest:\n");
-    let questList = await getApi("tasks");
-    let bugList = await getApi("bugs");
-    questList.forEach((questn, index) => {
-      let bugHp = [1];
-      questn.bugs.forEach((monstern) => {
-        let bugn = bugList.filter((bug) => bug.id == monstern);
-        bugHp.push(bugn[0].hp);
-      });
-      bugHp.shift();
-      console.log(
-        `${index + 1}: ${questn.name}\nDescription: ${
-          questn.description
-        }\nBug hp: ${bugHp}\nReward: ${questn.reward}\n`
-      );
-    });
+    let select = 1;
+    try {
+      while (select != 0) {
+        console.log("select a quest:\n");
+        let questList = await getApi("tasks");
+        let bugList = await getApi("bugs");
+        questList.forEach((questn, index) => {
+          let bugHp = [1];
+          questn.bugs.forEach((monstern) => {
+            let bugn = bugList.filter((bug) => bug.id == monstern);
+            bugHp.push(bugn[0].hp);
+          });
+          bugHp.shift();
+          console.log(
+            `${index + 1}: ${questn.name}\nDescription: ${
+              questn.description
+            }\nBug hp: ${bugHp}\nReward: ${questn.reward}\n`
+          );
+        });
+        select = await read("0 - Exit");
+        if (select == 0) {
+          clear();
+          console.log(
+            "Remember to come back at any time! The world needs to be saved!\n"
+          );
+          return 0;
+        }
+        if (select < 0 || select > 6) {
+          clear();
+          console.log(
+            "We need you to do missions, but please, select one that we have.\n"
+          );
+        } else {
+          battle();
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const store = async (costumer) => {
     clear();
-    console.log(
-      `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${costumer.gold}\n`
-    );
-    let equipList = await getApi("equipments");
-    let buy = 1;
-    while (buy != 0) {
-      equipList.forEach((equipn, index) => {
-        console.log(
-          `${index + 1} - ${equipn.name}\nPrice: ${equipn.value} gold\nStat: +${
-            equipn.affected_amount
-          } ${equipn.affected_attribute}\n`
-        );
-      });
-      buy = await read("0 - Exit");
-      if (buy == 0) {
-        clear();
-        console.log("Take care out there my friend!");
-        return 0;
+    try {
+      console.log(
+        `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${costumer.gold}\n`
+      );
+      let equipList = await getApi("equipments");
+      let buy = 1;
+      while (buy != 0) {
+        equipList.forEach((equipn, index) => {
+          console.log(
+            `${index + 1} - ${equipn.name}\nPrice: ${
+              equipn.value
+            } gold\nStat: +${equipn.affected_amount} ${
+              equipn.affected_attribute
+            }\n`
+          );
+        });
+        buy = await read("0 - Exit");
+        if (buy == 0) {
+          clear();
+          console.log("Take care out there my friend!");
+          return 0;
+        }
+        let pick = equipList[buy - 1];
+        if (buy < 0 || buy > 10) {
+          clear();
+          console.log(
+            "This item is out of stock. Do you want to buy anithing else??\n"
+          );
+        } else {
+          if (pick.value <= costumer.gold) {
+            let parameter = { equipments_id: pick };
+            console.log(parameter);
+            costumer.equipments.push(parameter);
+            costumer.gold -= pick.value;
+            clear();
+            console.log(
+              `Thanks for your Purchase! Do you want anything else?\nGold: ${costumer.gold}\n`
+            );
+          } else {
+            console.log(
+              `Sorry, ${costumer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!\n\nGold: ${costumer.gold}\n`
+            );
+          }
+        }
       }
-      let pick = equipList[buy - 1];
-      if (pick.value <= costumer.gold) {
-        costumer.equipments.push(pick);
-        costumer.gold = -pick.value;
-        clear();
-        console.log(
-          `Thanks for your Purchase! Do you want anything else?\nGold: ${costumer.gold}\n`
-        );
-      } else {
-        console.log(
-          `Sorry, ${costumer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!`
-        );
-      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -168,19 +210,20 @@ const menu = async () => {
       fagi = you.agi,
       attribute,
       amount;
+    console.log("Inventory:\n");
     you.equipments.forEach((item) => {
-      console.log(item);
+      console.log(`${item.equipments_id.name}`);
       amount = item.equipments_id.affected_amount;
       attribute = item.equipments_id.affected_attribute;
       if (attribute == "atk") {
-        fatk = +amount;
+        fatk += amount;
       } else if (attribute == "def") {
-        fdef = +amount;
+        fdef += amount;
       } else {
-        fagi = +amount;
+        fagi += amount;
       }
     });
-    console.log(`Attack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`);
+    console.log(`\nAttack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`);
   };
 
   const menu = async () => {
@@ -192,7 +235,7 @@ const menu = async () => {
     if (!user) return 0;
     while (nav != "0") {
       nav = await read(
-        `\nWhat do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n`
+        `What do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n`
       );
       switch (nav) {
         case "1":
