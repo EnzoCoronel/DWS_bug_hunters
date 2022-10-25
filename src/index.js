@@ -104,11 +104,17 @@ const menu = async () => {
     }
   };
 
-  const battle = async () => {
-    console.log("Insert battle here");
+  const battle = async (enemy, player) => {
+    console.log(`Your Agi: ${player.agi}\nBug Agi: ${enemy.agi}`);
+    if (player.agi >= enemy.agi){
+    console.log("You attack first, you win!");
+    }
+    else{
+      console.log("The bug attacks first, you lose!");
+    }
   }
 
-  const quests = async () => {
+  const quests = async (playerInfo) => {
     clear();
     let select = 1;
     try {
@@ -143,7 +149,11 @@ const menu = async () => {
             "We need you to do missions, but please, select one that we have.\n"
           );
         } else {
-          battle();
+          questList[select - 1].bugs.forEach((enemyId, index) => {
+            let enemyInfo = bugList.filter((bug) => bug.id == enemyId);
+            clear();
+            battle(enemyInfo[index], playerInfo); //add await
+          });
         }
       }
     } catch (error) {
@@ -245,7 +255,7 @@ const menu = async () => {
           await store(user);
           break;
         case "3":
-          await quests();
+          await quests(user);
           break;
         case "0":
           clear();
