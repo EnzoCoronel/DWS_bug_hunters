@@ -16,6 +16,11 @@ const menu = async () => {
     return response;
   };
 
+  const patchApi = async (equip, item) => {
+    const response = await axios.patch(api + item, equip);
+    return response;
+  };
+
   const getFactions = async () => {
     try {
       let facList = await getApi("factions");
@@ -107,9 +112,9 @@ const menu = async () => {
   const battle = async (enemy, player) => {
     console.log(`Your Agi: ${player.agi}\nBug Agi: ${enemy.agi}`);
     if (player.agi >= enemy.agi) {
-      console.log("You attack first, you win!");
+      console.log("You attack first, you win!\n");
     } else {
-      console.log("The bug attacks first, you lose!");
+      console.log("The bug attacks first, you lose!\n");
     }
   };
 
@@ -124,8 +129,8 @@ const menu = async () => {
         questList.forEach((questn, index) => {
           let bugHp = [1];
           questn.bugs.forEach((monstern) => {
-            let bugn = bugList.filter((bug) => bug.id == monstern);
-            bugHp.push(bugn[0].hp);
+            let bugn = bugList.find((bug) => bug.id == monstern);
+            bugHp.push(bugn.hp);
           });
           bugHp.shift();
           console.log(
@@ -148,11 +153,16 @@ const menu = async () => {
             "We need you to do missions, but please, select one that we have.\n"
           );
         } else {
-          let enemyId = questList[select - 1].bugs;
-          let enemyInfo = bugList.filter((bug) => bug.id == enemyId);
           clear();
-          console.log(enemyInfo); //n funfa se tem 2 bugs
-          battle(enemyInfo[0], playerInfo); //add await
+          let enemyList = [1];
+          questList[select - 1].bugs.forEach((enemyId) => {
+            let enemyInfo = bugList.find((bug) => bug.id == enemyId);
+            enemyList.push(enemyInfo);
+          });
+          enemyList.shift();
+          enemyList.forEach((enemy) => {
+            battle(enemy, playerInfo); //add await
+          });
         }
       }
     } catch (error) {
@@ -178,7 +188,7 @@ const menu = async () => {
             }\n`
           );
         });
-        buy = await read("0 - Exit");
+        buy = await read("0 - Exit\n");
         if (buy == 0) {
           clear();
           console.log("Take care out there my friend!");
@@ -193,9 +203,16 @@ const menu = async () => {
         } else {
           if (pick.value <= costumer.gold) {
             let parameter = { equipments_id: pick };
-            console.log(parameter);
             costumer.equipments.push(parameter);
             costumer.gold -= pick.value;
+            await patchApi(
+              { gold: costumer.gold },
+              `characters/${costumer.id}`
+            );
+            await patchApi(
+              { equipments: costumer.equipments },
+              `characters/${costumer.id}`
+            );
             clear();
             console.log(
               `Thanks for your Purchase! Do you want anything else?\nGold: ${costumer.gold}\n`
