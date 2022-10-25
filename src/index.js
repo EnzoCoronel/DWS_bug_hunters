@@ -109,12 +109,76 @@ const menu = async () => {
     }
   };
 
-  const battle = async (enemy, player) => {
-    console.log(`Your Agi: ${player.agi}\nBug Agi: ${enemy.agi}`);
-    if (player.agi >= enemy.agi) {
-      console.log("You attack first, you win!\n");
-    } else {
-      console.log("The bug attacks first, you lose!\n");
+  const battle = async (enemy, player, task) => {
+    try {
+      let turn, playerDmg, enemyDmg;
+      playerDmg = player.atk - enemy.def;
+      enemyDmg = enemy.atk - player.def;
+      if (playerDmg <= 0 && enemyDmg <= 0) {
+        console.log(
+          "This battle is useless, you and the bug are to weak in strengh to damage each other"
+        );
+      } else {
+        console.log(`You found ${enemy.name}!`);
+        if (player.agi >= enemy.agi) {
+          console.log("You attack first!\n");
+          turn = 1;
+        } else {
+          console.log("The bug attacks first!\n");
+          turn = 0;
+        }
+        while (player.hp > 0 && enemy.hp > 0) {
+          console.log(
+            `${player.name}: ${player.hp}\n${enemy.name}: ${enemy.hp}`
+          );
+          if (turn) {
+            if (playerDmg >= 0) {
+              enemy.hp -= playerDmg;
+              console.log(`You dealt ${playerDmg} dmg to the bug\n`);
+            } else {
+              console.log("Your dmg is null against this bug!\n");
+            }
+            turn--;
+          } else {
+            if (enemyDmg >= 0) {
+              player.hp -= enemyDmg;
+              console.log(`The bug deals ${enemyDmg} dmg to you\n`);
+            } else {
+              console.log(
+                "This bug is so easy to you that it can't deal dmg to you\n"
+              );
+            }
+            turn++;
+          }
+        }
+      }
+      if (enemy.hp <= 0) {
+        console.log(
+          `${player.name} wins! Congratulations. You won ${task.reward} gold!\n`
+        );
+        player.gold += task.reward;
+        await patchApi({ gold: player.gold }, `characters/${player.id}`);
+      } else if (player.hp <= 0) {
+        let inventory = player.equipments;
+        if (inventory.lenght > 0) {
+          console.log(
+            `${enemy.name} wins! Get up and ready to win the next time.\n`
+          );
+          let remove = Math.floor(Math.random() * inventory.lenght);
+          player.equipments[remove];
+          console.log(`You lost ${player.equipments[remove]}`);
+          await patchApi(
+            { equipments: player.equipments },
+            `characters/${player.id}`
+          );
+        } else {
+          console.log(player.equipments.lenght);
+          console.log("You are so poor that you got nothing to lose!\n");
+        }
+      }
+      player.hp = 10;
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -129,6 +193,7 @@ const menu = async () => {
         questList.forEach((questn, index) => {
           let bugHp = [1];
           questn.bugs.forEach((monstern) => {
+            //n sabia os bugs tinha a key task_id
             let bugn = bugList.find((bug) => bug.id == monstern);
             bugHp.push(bugn.hp);
           });
@@ -160,8 +225,8 @@ const menu = async () => {
             enemyList.push(enemyInfo);
           });
           enemyList.shift();
-          enemyList.forEach((enemy) => {
-            battle(enemy, playerInfo); //add await
+          enemyList.forEach(async (enemy) => {
+            await battle(enemy, playerInfo, questList[select - 1]);
           });
         }
       }
@@ -234,9 +299,10 @@ const menu = async () => {
     let fatk = you.atk,
       fdef = you.def,
       fagi = you.agi,
+      fhp = you.hp,
       attribute,
       amount;
-    console.log("Inventory:\n");
+    console.log("Inventory:");
     you.equipments.forEach((item) => {
       console.log(`${item.equipments_id.name}`);
       amount = item.equipments_id.affected_amount;
@@ -245,11 +311,15 @@ const menu = async () => {
         fatk += amount;
       } else if (attribute == "def") {
         fdef += amount;
-      } else {
+      } else if (attribute == "agi") {
         fagi += amount;
+      } else {
+        fhp += amount;
       }
     });
-    console.log(`\nAttack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`);
+    console.log(
+      `\nGold : ${you.gold}\n\nAttributes:\nHealth: ${fhp}\nAttack: ${fatk}\nDefense: ${fdef}\nAgility: ${fagi}\n`
+    );
   };
 
   const menu = async () => {
