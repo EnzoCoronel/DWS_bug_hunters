@@ -57,11 +57,11 @@ const menu = async () => {
   const create = async () => {
     console.log("Tell me traveller, who's side are you on?");
     let factionArray = await form();
-    console.log(`Welcome ${factionArray[0]} dev!`);
-
     let newName = await read("What is your name?\n"); //example for read user input
     clear();
-    console.log(`Nice to meet you ${newName}!\n`);
+    console.log(
+      `Welcome ${newName} from the ${factionArray[0]} devs! You are now registered in our army.\n`
+    );
     let persona = {
       atk: 10,
       def: 10,
@@ -109,77 +109,99 @@ const menu = async () => {
     }
   };
 
-  const battle = async (enemy, player, task) => {
+  const battle = async (enemy, player, playerDmg, enemyDmg) => {
     try {
-      let turn, playerDmg, enemyDmg;
-      playerDmg = player.atk - enemy.def;
-      enemyDmg = enemy.atk - player.def;
-      if (playerDmg <= 0 && enemyDmg <= 0) {
-        console.log(
-          "This battle is useless, you and the bug are to weak in strengh to damage each other"
-        );
+      let turn;
+      console.log(`You found ${enemy.name}!\n`);
+      if (player.agi >= enemy.agi) {
+        console.log("You attack first!\n");
+        turn = 1;
       } else {
-        console.log(`You found ${enemy.name}!`);
-        if (player.agi >= enemy.agi) {
-          console.log("You attack first!\n");
-          turn = 1;
-        } else {
-          console.log("The bug attacks first!\n");
-          turn = 0;
-        }
-        while (player.hp > 0 && enemy.hp > 0) {
-          console.log(
-            `${player.name}: ${player.hp}\n${enemy.name}: ${enemy.hp}`
-          );
-          if (turn) {
-            if (playerDmg >= 0) {
-              enemy.hp -= playerDmg;
-              console.log(`You dealt ${playerDmg} dmg to the bug\n`);
-            } else {
-              console.log("Your dmg is null against this bug!\n");
-            }
-            turn--;
+        console.log("The bug attacks first!\n");
+        turn = 0;
+      }
+      while (player.hp > 0 && enemy.hp > 0) {
+        console.log(`${player.name}: ${player.hp}\n${enemy.name}: ${enemy.hp}`);
+        if (turn) {
+          if (playerDmg >= 0) {
+            enemy.hp -= playerDmg;
+            console.log(`You dealt ${playerDmg} dmg to the bug\n`);
           } else {
-            if (enemyDmg >= 0) {
-              player.hp -= enemyDmg;
-              console.log(`The bug deals ${enemyDmg} dmg to you\n`);
-            } else {
-              console.log(
-                "This bug is so easy to you that it can't deal dmg to you\n"
-              );
-            }
-            turn++;
+            console.log("Your dmg is null against this bug!\n");
           }
+          turn--;
+        } else {
+          if (enemyDmg >= 0) {
+            player.hp -= enemyDmg;
+            console.log(`The bug deals ${enemyDmg} dmg to you\n`);
+          } else {
+            console.log(
+              "This bug is so easy to you that it can't deal dmg to you\n"
+            );
+          }
+          turn++;
         }
       }
       if (enemy.hp <= 0) {
-        console.log(
-          `${player.name} wins! Congratulations. You won ${task.reward} gold!\n`
-        );
-        player.gold += task.reward;
-        await patchApi({ gold: player.gold }, `characters/${player.id}`);
+        console.log(`${player.name} wins! Congratulations.\n`);
       } else if (player.hp <= 0) {
-        let inventory = player.equipments;
-        if (inventory.lenght > 0) {
-          console.log(
-            `${enemy.name} wins! Get up and ready to win the next time.\n`
-          );
-          let remove = Math.floor(Math.random() * inventory.lenght);
-          player.equipments[remove];
-          console.log(`You lost ${player.equipments[remove]}`);
-          await patchApi(
-            { equipments: player.equipments },
-            `characters/${player.id}`
-          );
-        } else {
-          console.log(player.equipments.lenght);
-          console.log("You are so poor that you got nothing to lose!\n");
-        }
+        console.log(
+          `${enemy.name} wins! Get up and ready to win the next time.\n`
+        );
       }
-      player.hp = 10;
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const mission = async (gamer, task, enemies) => {
+    clear();
+    let pDmg,
+      bDmg,
+      enemyList = [1],
+      weak,
+      b4battle = gamer.hp;
+    task.bugs.forEach((enemyId) => {
+      let enemyInfo = enemies.find((bug) => bug.id == enemyId);
+      enemyList.push(enemyInfo);
+    });
+    enemyList.shift();
+    enemyList.forEach(async (foe) => {
+      pDmg = gamer.atk - foe.def;
+      bDmg = foe.atk - gamer.def;
+      if (pDmg <= 0) {
+        weak = 1;
+      } else if (gamer.hp > 0) {
+        await battle(foe, gamer, pDmg, bDmg);
+      } else {
+        console.log(
+          "You start fainting, so you return to the base and leave behind an item!"
+        );
+      }
+    });
+    if (gamer.hp > 0 && weak != 1) {
+      console.log(`You won ${task.reward} gold!\n`);
+      gamer.gold += task.reward;
+      await patchApi({ gold: gamer.gold }, `characters/${gamer.id}`);
+    } else if (gamer.hp <= 0) {
+      if (gamer.equipments.length > 0) {
+        let remove = Math.floor(Math.random() * gamer.equipments.length);
+        console.log(`You lost ${gamer.equipments[remove].equipments_id.name}`);
+        gamer.equipments.splice(remove, 1);
+        await patchApi(
+          { equipments: gamer.equipments },
+          `characters/${gamer.id}`
+        );
+      } else {
+        console.log("You are so poor that you got nothing to lose!\n");
+      }
+    }
+    else {
+      console.log(
+        "You are about to start the fight, but notice you are too weak and return to the base."
+      );
+    }
+    gamer.hp = b4battle;
   };
 
   const quests = async (playerInfo) => {
@@ -201,7 +223,9 @@ const menu = async () => {
           console.log(
             `${index + 1}: ${questn.name}\nDescription: ${
               questn.description
-            }\nBug hp: ${bugHp}\nReward: ${questn.reward}\n`
+            }\nBug hp: ${bugHp}\nReward: ${questn.reward}\nComplexity level: ${
+              questn.complexity_level
+            }\n`
           );
         });
         select = await read("0 - Exit");
@@ -218,16 +242,7 @@ const menu = async () => {
             "We need you to do missions, but please, select one that we have.\n"
           );
         } else {
-          clear();
-          let enemyList = [1];
-          questList[select - 1].bugs.forEach((enemyId) => {
-            let enemyInfo = bugList.find((bug) => bug.id == enemyId);
-            enemyList.push(enemyInfo);
-          });
-          enemyList.shift();
-          enemyList.forEach(async (enemy) => {
-            await battle(enemy, playerInfo, questList[select - 1]);
-          });
+          mission(playerInfo, questList[select - 1], bugList);
         }
       }
     } catch (error) {
@@ -263,7 +278,7 @@ const menu = async () => {
         if (buy < 0 || buy > 10) {
           clear();
           console.log(
-            "This item is out of stock. Do you want to buy anithing else??\n"
+            "This item is out of stock. Do you want to buy anything else?\n"
           );
         } else {
           if (pick.value <= costumer.gold) {
