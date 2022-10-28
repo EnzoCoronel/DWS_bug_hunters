@@ -238,7 +238,7 @@ const menu = async () => {
       amount;
     console.log("Inventory:\n");
     you.equipments.forEach((item) => {
-      console.log(`${item.equipments_id.name}`);
+      console.log(item);
       amount = item.equipments_id.affected_amount;
       attribute = item.equipments_id.affected_attribute;
       if (attribute == "atk") {
