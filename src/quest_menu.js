@@ -101,8 +101,8 @@ export const quests = async (playerInfo) => {
   let select = 1;
   try {
     let questList = await getApi("tasks");
-    let bugList = await getApi("bugs");
     while (select != 0) {
+      let bugList = await getApi("bugs"); //make bug hp return to default
       console.log("select a quest:\n");
       questList.forEach((questn, index) => {
         let bugHp = [1];

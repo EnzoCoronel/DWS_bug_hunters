@@ -13,7 +13,7 @@ const form = async () => {
       facChoice = await read("");
       facChoice--;
       if (facChoice >= 0 && facChoice < 3) {
-        return [factions[facChoice].name, factions[facChoice].id]; //olhar essa line. Transformar array em object
+        return { name: factions[facChoice].name, id: factions[facChoice].id }; //olhar essa line. Transformar array em object
       } else {
         clear();
         console.error("Chose a valid option.");
@@ -27,11 +27,11 @@ const form = async () => {
 
 export const create = async () => {
   console.log("Tell me traveller, who's side are you on?");
-  let factionArray = await form();
+  let faction = await form();
   let newName = await read("What is your name?\n"); //example for read user input
   clear();
   console.log(
-    `Welcome ${newName} from the ${factionArray[0]} devs! You are now registered in our army.\n`
+    `Welcome ${newName} from the ${faction.name} devs! You are now registered in our army.\n`
   );
   let persona = {
     atk: 10,
@@ -43,8 +43,8 @@ export const create = async () => {
     factions: [
       {
         factions_id: {
-          id: factionArray[1],
-          name: factionArray[0],
+          id: faction.id,
+          name: faction.name,
         },
       },
     ],
