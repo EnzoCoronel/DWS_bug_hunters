@@ -1,6 +1,8 @@
 import read from "../resources/read.js";
 import { clear } from "console";
 import { getApi, patchApi } from "./index.js";
+import { genRandNum } from "./utilities.js";
+import { changeStats } from "./Store_and_status_menu.js";
 
 const battle = (enemy, player, playerDmg, enemyDmg) => {
   try {
@@ -77,6 +79,7 @@ const mission = async (gamer, task, enemies) => {
     if (gamer.equipments.length > 0) {
       let remove = genRandNum(gamer.equipments.length);
       console.log(`You lost ${gamer.equipments[remove].equipments_id.name}`);
+      changeStats(gamer, gamer.equipments[remove], 0);
       gamer.equipments.splice(remove, 1);
       await patchApi(
         { equipments: gamer.equipments },

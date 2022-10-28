@@ -13,18 +13,20 @@ export const stats = (you) => {
   );
 };
 
-export const addStats = (person, piece) => {
+export const changeStats = (person, piece, mod) => {
   let attribute, amount;
   amount = piece.equipments_id.affected_amount;
   attribute = piece.equipments_id.affected_attribute;
-  if (attribute == "atk") {
-    person.atk += amount;
-  } else if (attribute == "def") {
-    person.def += amount;
-  } else if (attribute == "agi") {
-    person.agi += amount;
+  if (mod == 1) {
+    if (attribute == "atk") person.atk += amount;
+    else if (attribute == "def") person.def += amount;
+    else if (attribute == "agi") person.agi += amount;
+    else person.hp += amount;
   } else {
-    person.hp += amount;
+    if (attribute == "atk") person.atk -= amount;
+    else if (attribute == "def") person.def -= amount;
+    else if (attribute == "agi") person.agi -= amount;
+    else person.hp -= amount;
   }
 };
 
@@ -66,7 +68,7 @@ export const store = async (custumer) => {
             { equipments: custumer.equipments },
             `characters/${custumer.id}`
           );
-          addStats(custumer, parameter);
+          changeStats(custumer, parameter, 1);
           clear();
           console.log(
             `Thanks for your Purchase! Do you want anything else?\nGold: ${custumer.gold}\n`

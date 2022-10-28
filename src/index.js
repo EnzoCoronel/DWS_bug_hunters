@@ -3,7 +3,7 @@ import axios from "axios";
 import { clear } from "console";
 import { quests } from "./quest_menu.js";
 import { create } from "./creation_menu.js";
-import { stats, addStats, store } from "./Store_and_status_menu.js";
+import { stats, changeStats, store } from "./Store_and_status_menu.js";
 import { search } from "./utilities.js";
 
 const api = "https://ir39vnlo.directus.app/items/";
@@ -39,7 +39,6 @@ const menu = async () => {
         break;
       case "0":
         clear();
-        console.log("We will miss you!\n");
         break;
       default:
         clear();
@@ -57,7 +56,7 @@ const list = async () => {
   const user = await search(name);
   if (!user) return 0;
   user.equipments.forEach((item) => {
-    addStats(user, item);
+    changeStats(user, item, 1);
   });
   while (nav != "0") {
     nav = await read(
