@@ -30,11 +30,11 @@ export const changeStats = (person, piece, mod) => {
   }
 };
 
-export const store = async (custumer) => {
+export const store = async (customer) => {
   clear();
   try {
     console.log(
-      `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${custumer.gold}\n`
+      `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${customer.gold}\n`
     );
     let equipList = await getApi("equipments");
     let buy = 1;
@@ -59,23 +59,23 @@ export const store = async (custumer) => {
           "This item is out of stock. Do you want to buy anything else?\n"
         );
       } else {
-        if (pick.value <= custumer.gold) {
+        if (pick.value <= customer.gold) {
           let parameter = { equipments_id: pick };
-          custumer.equipments.push(parameter);
-          custumer.gold -= pick.value;
-          await patchApi({ gold: custumer.gold }, `characters/${custumer.id}`);
+          customer.equipments.push(parameter);
+          customer.gold -= pick.value;
+          await patchApi({ gold: customer.gold }, `characters/${customer.id}`);
           await patchApi(
-            { equipments: custumer.equipments },
-            `characters/${custumer.id}`
+            { equipments: customer.equipments },
+            `characters/${customer.id}`
           );
-          changeStats(custumer, parameter, 1);
+          changeStats(customer, parameter, 1);
           clear();
           console.log(
-            `Thanks for your Purchase! Do you want anything else?\nGold: ${custumer.gold}\n`
+            `Thanks for your Purchase! Do you want anything else?\nGold: ${customer.gold}\n`
           );
         } else {
           console.log(
-            `Sorry, ${custumer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!\n\nGold: ${custumer.gold}\n`
+            `Sorry, ${customer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!\n\nGold: ${customer.gold}\n`
           );
         }
       }
