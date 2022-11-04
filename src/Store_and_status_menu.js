@@ -5,9 +5,11 @@ import { getApi, patchApi } from "./index.js";
 export const stats = (you) => {
   clear();
   console.log("Inventory:");
-  you.equipments.forEach((item) => {
-    console.log(`${item.equipments_id.name}`);
-  });
+  if (you.equipment) {
+    you.equipment.forEach((item) => {
+      console.log(`${item.name}`);
+    });
+  }
   console.log(
     `\nGold : ${you.gold}\n\nAttributes:\nHealth: ${you.hp}\nAttack: ${you.atk}\nDefense: ${you.def}\nAgility: ${you.agi}\n`
   );
@@ -15,8 +17,8 @@ export const stats = (you) => {
 
 export const changeStats = (person, piece, mod) => {
   let attribute, amount;
-  amount = piece.equipments_id.affected_amount;
-  attribute = piece.equipments_id.affected_attribute;
+  amount = piece.affected_amount;
+  attribute = piece.affected_attribute;
   if (mod == 1) {
     if (attribute == "atk") person.atk += amount;
     else if (attribute == "def") person.def += amount;
@@ -36,7 +38,7 @@ export const store = async (customer) => {
     console.log(
       `You want it? It's your's my friend! As long as you have enough gold.\nGold: ${customer.gold}\n`
     );
-    let equipList = await getApi("equipments");
+    let equipList = await getApi("equipment");
     let buy = 1;
     while (buy != 0) {
       equipList.forEach((equipn, index) => {
@@ -60,13 +62,16 @@ export const store = async (customer) => {
         );
       } else {
         if (pick.value <= customer.gold) {
-          let parameter = { equipments_id: pick };
-          customer.equipments.push(parameter);
+          let parameter = pick;
+          customer.equipment.push(parameter);
           customer.gold -= pick.value;
-          await patchApi({ gold: customer.gold }, `characters/${customer.id}`);
           await patchApi(
-            { equipments: customer.equipments },
-            `characters/${customer.id}`
+            {
+              gold: customer.gold,
+              equipment: customer.equipment,
+              id: customer.id,
+            },
+            `characters`
           );
           changeStats(customer, parameter, 1);
           clear();

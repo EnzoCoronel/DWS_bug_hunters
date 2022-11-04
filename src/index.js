@@ -6,10 +6,10 @@ import { search } from "./utilities.js";
 import { quests } from "./quest_menu.js";
 import { stats, changeStats, store } from "./Store_and_status_menu.js";
 
-const api = "https://ir39vnlo.directus.app/items/";
+const api = "https://dws-bug-hunters-api.vercel.app/api/";
 
 export const getApi = async (item) => {
-  const response = (await axios.get(api + item)).data.data;
+  const response = (await axios.get(api + item)).data;
   return response;
 };
 
@@ -55,9 +55,11 @@ const list = async () => {
   clear();
   const user = await search(name);
   if (!user) return 0;
-  user.equipments.forEach((item) => {
-    changeStats(user, item, 1);
-  });
+  if (user.equipment) {
+    user.equipment.forEach((item) => {
+      changeStats(user, item, 1);
+    });
+  }
   while (nav != "0") {
     nav = await read(
       `What do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n`

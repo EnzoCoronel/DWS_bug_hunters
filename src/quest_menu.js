@@ -8,11 +8,11 @@ const battle = (enemy, player, playerDmg, enemyDmg) => {
   try {
     let turn;
     console.log(`You found ${enemy.name}!\n`);
-    if (player.agi >= enemy.agi) {
-      console.log("You attack first!\n");
+    if (enemy.agi > player.agi) {
+      console.log("The bug attacks first!\n");
       turn = 1;
     } else {
-      console.log("The bug attacks first!\n");
+      console.log("You attack first!\n");
       turn = 0;
     }
     while (player.hp > 0 && enemy.hp > 0) {
@@ -45,19 +45,17 @@ const battle = (enemy, player, playerDmg, enemyDmg) => {
       );
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
-const mission = async (gamer, task, enemies) => {
+const mission = async (gamer, task) => {
   clear();
   let pDmg,
     bDmg,
     weak,
     b4battle = gamer.hp;
-  let enemyList = task.bugs.map(
-    (bug) => (bug = enemies.find((x) => x.id == bug))
-  );
+  let enemyList = task.bugs;
   enemyList.forEach((foe) => {
     pDmg = gamer.atk - foe.def;
     bDmg = foe.atk - gamer.def;
@@ -76,15 +74,12 @@ const mission = async (gamer, task, enemies) => {
     gamer.gold += task.reward;
     await patchApi({ gold: gamer.gold }, `characters/${gamer.id}`);
   } else if (gamer.hp <= 0) {
-    if (gamer.equipments.length > 0) {
-      let remove = genRandNum(gamer.equipments.length);
-      console.log(`You lost ${gamer.equipments[remove].equipments_id.name}`);
-      changeStats(gamer, gamer.equipments[remove], 0);
-      gamer.equipments.splice(remove, 1);
-      await patchApi(
-        { equipments: gamer.equipments },
-        `characters/${gamer.id}`
-      );
+    if (gamer.equipment.length > 0) {
+      let remove = genRandNum(gamer.equipment.length);
+      console.log(`You lost ${gamer.equipment[remove].name}`);
+      changeStats(gamer, gamer.equipment[remove], 0);
+      gamer.equipment.splice(remove, 1);
+      await patchApi({ equipment: gamer.equipment }, `characters/${gamer.id}`);
     } else {
       console.log("You are so poor that you got nothing to lose!\n");
     }
@@ -102,21 +97,17 @@ export const quests = async (playerInfo) => {
   try {
     let questList = await getApi("tasks");
     while (select != 0) {
-      let bugList = await getApi("bugs"); //make bug hp return to default
       console.log("select a quest:\n");
       questList.forEach((questn, index) => {
-        let bugHp = [1];
-        questn.bugs.forEach((monstern) => {
-          //n sabia os bugs tinha a key task_id
-          let bugn = bugList.find((bug) => bug.id == monstern);
-          bugHp.push(bugn.hp);
+        let bugName = [];
+        questn.bugs.forEach((bug) => {
+          bugName.push(bug.name);
         });
-        bugHp.shift();
         console.log(
           `${index + 1}: ${questn.name}\nDescription: ${
             questn.description
-          }\nBug hp: ${bugHp}\nReward: ${questn.reward}\nComplexity level: ${
-            questn.complexity_level
+          }\nBugs: ${bugName}\nReward: ${questn.reward}\nComplexity level: ${
+            questn.complexity
           }\n`
         );
       });
@@ -134,7 +125,7 @@ export const quests = async (playerInfo) => {
           "We need you to do missions, but please, select one that we have.\n"
         );
       } else {
-        mission(playerInfo, questList[select - 1], bugList);
+        mission(playerInfo, questList[select - 1]);
       }
     }
   } catch (error) {

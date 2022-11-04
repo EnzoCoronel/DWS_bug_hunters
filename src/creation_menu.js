@@ -21,7 +21,7 @@ const form = async () => {
       facChoice++;
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -34,25 +34,23 @@ export const create = async () => {
     `Welcome ${newName} from the ${faction.name} devs! You are now registered in our army.\n`
   );
   let persona = {
+    name: newName,
+    hp: 100,
     atk: 10,
     def: 10,
     agi: 10,
-    hp: 10,
     gold: 100,
-    name: newName,
     factions: [
       {
-        factions_id: {
-          id: faction.id,
-          name: faction.name,
-        },
+        id: faction.id,
+        name: faction.name,
       },
     ],
-    equipments: [],
+    equipment: [],
   };
   try {
-    const print = persona; //await postApi(persona, "characters?fields=*,equipments.equipments_id.*,factions.factions_id.*")
+    await postApi(persona, "characters");
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
