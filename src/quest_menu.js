@@ -26,7 +26,7 @@ const battle = (enemy, player, playerDmg, enemyDmg) => {
         }
         turn = 0;
       } else {
-        if (enemyDmg >= 0) {
+        if (enemyDmg > 0) {
           player.hp -= enemyDmg;
           console.log(`The bug deals ${enemyDmg} dmg to you\n`);
         } else {
@@ -88,10 +88,10 @@ const mission = async (gamer, task) => {
     }
   } else {
     console.log(
-      `You are about to start the fight, but notice you are too weak and return to the base.\nYou need ${Math.abs(
-        pDmg
-      )} more dmg to fix the bug!`
+      `You are about to start the fight, but notice you are too weak and return to the base.`
     );
+    pDmg -= 1;
+    console.log(`You need + ${Math.abs(pDmg)} dmg to fix the bug!`);
   }
   gamer.hp = b4battle;
 };

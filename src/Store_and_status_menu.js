@@ -57,9 +57,11 @@ export const store = async (customer) => {
        *,.,*                                                ,, ,,*\n`);
       equipList.forEach((equipn, index) => {
         console.log(
-          ` ${index + 1} - ${equipn.name}\n Price: ${equipn.value} gold\n Stat: +${
-            equipn.affected_amount
-          } ${equipn.affected_attribute}\n`
+          ` ${index + 1} - ${equipn.name}\n Price: ${
+            equipn.value
+          } gold\n Stat: +${equipn.affected_amount} ${
+            equipn.affected_attribute
+          }\n`
         );
       });
       console.log(`      ,,//**************************************************//*,,
@@ -97,6 +99,7 @@ export const store = async (customer) => {
             `Thanks for your Purchase! Do you want anything else?\nGold: ${customer.gold}\n`
           );
         } else {
+          clear();
           console.log(
             `Sorry, ${customer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!\n\nGold: ${customer.gold}\n`
           );

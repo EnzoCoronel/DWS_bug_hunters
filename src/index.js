@@ -29,7 +29,9 @@ const menu = async () => {
   clear();
 
   while (choice != "0") {
-    console.log("\n---------------\nDWS BUG HUNTERS\n---------------\n");
+    console.log(
+      "\n   ---------------\n   DWS BUG HUNTERS\n   ---------------\n"
+    );
     choice = await read("1 - Create Character\n2 - Log in\n0 - Exit\n");
     switch (choice) {
       case "1":

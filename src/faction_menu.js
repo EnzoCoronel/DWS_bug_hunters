@@ -24,6 +24,7 @@ export const join = async (rookie) => {
   } else {
     rookie.factions.forEach((element) => {
       if (element.name == facList[unite].name) {
+        clear();
         console.log(`You already are a ${element.name} Dev.`);
         condition = 0;
       }
@@ -51,20 +52,20 @@ export const leave = async (renegade) => {
   renegade.factions.forEach((facn, index) => {
     console.log(`${index + 1} - ${facn.name}`);
   });
-  let action = await read("");
+  let action = await read("0 - Exit\n");
   if (action == 0) {
     clear();
     return 0;
   }
   let depart = action - 1;
-  if (depart < 0 || depart > renegade.factions.length) {
+  if (depart < 0 || depart > renegade.factions.length - 1) {
     clear();
     console.log(
       "You can`t leave null. You will always be null in your heart.\n"
     );
   } else {
     console.log(
-      `You leave ${renegade.factions[depart]} devs. They will miss you... I think.`
+      `You leave ${renegade.factions[depart].name} devs. They will miss you... I think.`
     );
     renegade.factions.splice(depart, 1);
     await patchApi(
