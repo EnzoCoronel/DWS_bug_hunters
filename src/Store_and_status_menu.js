@@ -13,6 +13,11 @@ export const stats = (you) => {
   console.log(
     `\nGold : ${you.gold}\n\nAttributes:\nHealth: ${you.hp}\nAttack: ${you.atk}\nDefense: ${you.def}\nAgility: ${you.agi}\n`
   );
+  let facName = [];
+  you.factions.forEach((fac) => {
+    facName.push(fac.name);
+  });
+  console.log(`You are a member of ${facName} devs.\n`);
 };
 
 export const changeStats = (person, piece, mod) => {

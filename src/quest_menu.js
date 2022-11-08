@@ -72,14 +72,14 @@ const mission = async (gamer, task) => {
   if (gamer.hp > 0 && weak != 1) {
     console.log(`You won ${task.reward} gold!\n`);
     gamer.gold += task.reward;
-    await patchApi({ gold: gamer.gold }, `characters/${gamer.id}`);
+    await patchApi({ gold: gamer.gold, id: customer.id }, "characters");
   } else if (gamer.hp <= 0) {
     if (gamer.equipment.length > 0) {
       let remove = genRandNum(gamer.equipment.length);
       console.log(`You lost ${gamer.equipment[remove].name}`);
       changeStats(gamer, gamer.equipment[remove], 0);
       gamer.equipment.splice(remove, 1);
-      await patchApi({ equipment: gamer.equipment }, `characters/${gamer.id}`);
+      await patchApi({ equipment: gamer.equipment, id: customer.id }, "characters");
     } else {
       console.log("You are so poor that you got nothing to lose!\n");
     }
