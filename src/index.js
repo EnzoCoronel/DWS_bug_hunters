@@ -5,6 +5,7 @@ import { create } from "./creation_menu.js";
 import { search } from "./utilities.js";
 import { quests } from "./quest_menu.js";
 import { stats, changeStats, store } from "./Store_and_status_menu.js";
+import { join, leave } from "./faction_menu.js";
 
 const api = "https://dws-bug-hunters-api.vercel.app/api/";
 
@@ -28,7 +29,9 @@ const menu = async () => {
   clear();
 
   while (choice != "0") {
-    console.log("\n---------------\nDWS BUG HUNTERS\n---------------\n");
+    console.log(
+      "\n   ---------------\n   DWS BUG HUNTERS\n   ---------------\n"
+    );
     choice = await read("1 - Create Character\n2 - Log in\n0 - Exit\n");
     switch (choice) {
       case "1":
@@ -62,7 +65,7 @@ const list = async () => {
   }
   while (nav != "0") {
     nav = await read(
-      `What do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n0 - Exit\n`
+      `What do you want to do now ${name}?\n1 - Stats\n2 - Store \n3 - Quests\n4 - Join a faction\n5 - Leave a faction\n0 - Exit\n`
     );
     switch (nav) {
       case "1":
@@ -73,6 +76,12 @@ const list = async () => {
         break;
       case "3":
         await quests(user);
+        break;
+      case "4":
+        await join(user);
+        break;
+      case "5":
+        await leave(user);
         break;
       case "0":
         clear();

@@ -13,6 +13,11 @@ export const stats = (you) => {
   console.log(
     `\nGold : ${you.gold}\n\nAttributes:\nHealth: ${you.hp}\nAttack: ${you.atk}\nDefense: ${you.def}\nAgility: ${you.agi}\n`
   );
+  let facName = [];
+  you.factions.forEach((fac) => {
+    facName.push(fac.name);
+  });
+  console.log(`You are a member of ${facName} devs.\n`);
 };
 
 export const changeStats = (person, piece, mod) => {
@@ -41,13 +46,28 @@ export const store = async (customer) => {
     let equipList = await getApi("equipment");
     let buy = 1;
     while (buy != 0) {
+      console.log(`             *%%#,,,/%%%.,./%%#,,,/%%%..,*%%%,.,*%%%*,,,#%%.
+            #%#/.,./%##,...%%#(.../%#%....#%#(.../%##*...#%%(
+         .###(....#%##....(###....(###*...*###/...,#%#(...,###(
+      .####,....####*... %%##*....####(....(%##(..../###(..../#%#(
+ .*####*.. .,####(.....(####*....,#####... .#####*....*####(..  ,/###(*
+.%%%%#******#%%%%**,**/%%%%%*****/%%%%%*****/%%%%%*****(%%%%#*****/%%%%#
+.%%%%#,,,,,,#%%%#,,,,,*#%%%#,,,,,*#%%%#,,,,,*#%%%#.,,,,/%%%%#,,,,,/%%%%#
+ ,(#(, ...,/*(#(. .... *##(,  ... ,##(. ...  *##(. ...  *##/**..., *##(.
+       *,.,*                                                ,, ,,*\n`);
       equipList.forEach((equipn, index) => {
         console.log(
-          `${index + 1} - ${equipn.name}\nPrice: ${equipn.value} gold\nStat: +${
-            equipn.affected_amount
-          } ${equipn.affected_attribute}\n`
+          ` ${index + 1} - ${equipn.name}\n Price: ${
+            equipn.value
+          } gold\n Stat: +${equipn.affected_amount} ${
+            equipn.affected_attribute
+          }\n`
         );
       });
+      console.log(`      ,,//**************************************************//*,,
+    ****************************************************************,
+   ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+     .*************************************************************\n`);
       buy = await read("0 - Exit\n");
       if (buy == 0) {
         clear();
@@ -79,6 +99,7 @@ export const store = async (customer) => {
             `Thanks for your Purchase! Do you want anything else?\nGold: ${customer.gold}\n`
           );
         } else {
+          clear();
           console.log(
             `Sorry, ${customer.name}. I can't give credit. Come back when you are a little... mmmmmm richer!\n\nGold: ${customer.gold}\n`
           );
