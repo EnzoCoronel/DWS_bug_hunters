@@ -72,20 +72,25 @@ const mission = async (gamer, task) => {
   if (gamer.hp > 0 && weak != 1) {
     console.log(`You won ${task.reward} gold!\n`);
     gamer.gold += task.reward;
-    await patchApi({ gold: gamer.gold, id: customer.id }, "characters");
+    await patchApi({ gold: gamer.gold, id: gamer.id }, "characters");
   } else if (gamer.hp <= 0) {
     if (gamer.equipment.length > 0) {
       let remove = genRandNum(gamer.equipment.length);
       console.log(`You lost ${gamer.equipment[remove].name}`);
       changeStats(gamer, gamer.equipment[remove], 0);
       gamer.equipment.splice(remove, 1);
-      await patchApi({ equipment: gamer.equipment, id: customer.id }, "characters");
+      await patchApi(
+        { equipment: gamer.equipment, id: gamer.id },
+        "characters"
+      );
     } else {
       console.log("You are so poor that you got nothing to lose!\n");
     }
   } else {
     console.log(
-      "You are about to start the fight, but notice you are too weak and return to the base."
+      `You are about to start the fight, but notice you are too weak and return to the base.\nYou need ${Math.abs(
+        pDmg
+      )} more dmg to fix the bug!`
     );
   }
   gamer.hp = b4battle;
@@ -103,12 +108,16 @@ export const quests = async (playerInfo) => {
         questn.bugs.forEach((bug) => {
           bugName.push(bug.name);
         });
+        let factionName = [];
+        questn.factions.forEach((faction) => {
+          factionName.push(faction.name);
+        });
         console.log(
           `${index + 1}: ${questn.name}\nDescription: ${
             questn.description
           }\nBugs: ${bugName}\nReward: ${questn.reward}\nComplexity level: ${
             questn.complexity
-          }\n`
+          }\nFaction required: ${factionName}\n`
         );
       });
       select = await read("0 - Exit");
@@ -122,10 +131,23 @@ export const quests = async (playerInfo) => {
       if (select < 0 || select > 6) {
         clear();
         console.log(
-          "We need you to do missions, but please, select one that we have.\n"
+          "We need you to do tasks, but please, select one that we have.\n"
         );
       } else {
-        mission(playerInfo, questList[select - 1]);
+        let found;
+        questList[select - 1].factions.forEach((fac) => {
+          if (playerInfo.factions.find((element) => element.name == fac.name)) {
+            found = 1;
+          }
+        });
+        if (found) {
+          mission(playerInfo, questList[select - 1]);
+        } else {
+          clear();
+          console.log(
+            "You're not from the function we asked for, call another dev!\n"
+          );
+        }
       }
     }
   } catch (error) {
